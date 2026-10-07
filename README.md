@@ -1,171 +1,82 @@
-# Previsão cancer de mama: Malignos ou Benignos
+# Breast Cancer Classification
 
-Este projeto utiliza aprendizado de máquina para identificar tumores benignos e malignos com base em um conjunto de dados que contém várias características do tumor. A análise é feita com a utilização de machine learning.
+Projeto de classificação de tumores mamários benignos e malignos usando o Wisconsin Diagnostic Breast Cancer dataset. A reorganização preserva o XGBoost, o Random Forest, a escolha de threshold via precision-recall e as métricas/imagens já documentadas.
 
-# Dataset
-O conjunto de dados contém variáveis relacionadas às características morfológicas de tumores de mama, incluindo medidas de raio, textura, perímetro, área, suavidade, compacidade, concavidade, pontos côncavos, simetria e dimensão fractal, calculadas a partir de imagens digitalizadas de massas mamárias.  
-Classes da target: Benigno (0) e Maligno (1).  
-Fonte: Kaggle
+> **Uso educacional:** este modelo não é dispositivo médico e não deve ser usado para diagnóstico ou decisão clínica.
 
-# Resultados Principais
+## Estrutura
 
-Modelo selecionado com base em desempenho global e priorização de sensibilidade clínica. 
-Recall para classe Benigna =: 91%  
-Recall para classe Maligna =: 100%  
-Precision para classes Benigna =: 100%  
-Precision para classes Maligna =: 86%
-
-# Modelo Selecionado
-XGBOOST: Classificador binário, com ajuste de threshold baseado na curva Precision-Recall para priorizar recall da classe maligna.
-
-# Bibliotecas e Ferramentas Utilizadas
-
-Pandas: Para manipulação e análise de dados.  
-Numpy: Para operações matemáticas e manipulação de arrays.  
-Scikit-learn: Para pré-processamento de dados, como Label Encoding e One-Hot Encoding, e divisão de dados em treino e teste.  
-Matplotlib: Para visualização de gráficos e métricas.  
-Seaborn: Para visualização de gráficos.
-
-# Estrutura do Projeto
-``` python
-Predição-cancer-de-mama
-│
-├── dataset/
-│   ├── cancer_mama.csv  # Dataset original
-│   └── dados.py         # Carregamento e manipulação dos dados
-│
-|── images/              # Visualizações necessarias
-|
-├── notebooks/
-│   ├── eda.py             # Análise exploratória de dados
-│   ├── preprocess.py      # split treino/teste
-|   └── visualization      # visualizações
-│
-├── src/
-│   ├── models/            # Treinamento com Modelos Diferentes(model_forest, model_keras, etc ..)
-│   └── utils/             # Pasta Metrics e Predicts
-|        ├── metrics/            # Metricas de todos os modelos (metrics_forest, metrics_keras, etc ..)
-│        └── predict/            # Predição de todos os modelos (predict_forest, predict_keras, etc ..)
-│
-├── best_model/
-│   ├── predicao_cancer_mama.pkl  # Melhor modelo serializado
-│   └── model.py           # Lógica para escolha e exportação do melhor modelo
-|
-├── requirements.txt       # Bibliotecas para instalação
-└── README.md              # Documentação do projeto
+```text
+.
+├── data/                 # dados locais (não versionados)
+│   └── raw/.gitkeep
+├── images/               # figuras do projeto
+├── models/               # artefatos treinados (gerados localmente)
+├── notebooks/            # exploração e avaliação reproduzíveis
+├── reports/              # métricas e figuras geradas
+├── src/breast_cancer/    # pacote Python reutilizável
+├── pyproject.toml
+└── README.md
 ```
 
-# Leitura do Dataset
+## Configuração
 
-O conjunto de dados foi carregado a partir de um arquivo CSV contendo características morfológicas dos tumores.
-```python
-dados = pd.read_csv('dataset/cancer_mama.csv')
+Requer Python 3.10 ou superior. Crie um ambiente e instale o projeto:
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+python -m pip install -e ".[notebooks]"
 ```
 
-# Pré-processamento
+Coloque o CSV original em `data/raw/cancer_mama.csv`. O CSV deve conter `diagnosis` (`B` benigno, `M` maligno) e os atributos do dataset. O arquivo não foi incluído neste repositório; os dados locais são ignorados pelo Git.
 
-Remoção de colunas irrelevantes: id, Unnamed: 32  
-Transformação da target (B = 0, M = 1)  
-Split treino/teste: 60% treino / 40% teste  
-Funções utilitárias para:  
-Codificação de variáveis categóricas  
-Visualização de correlações  
-Identificação de outliers  
+## Execução
 
-# Parametro do Modelo
+Abra os notebooks em ordem:
 
-objective='binary:logistic', 
-eval_metric='auc',            
-n_estimators=1000,             
-learning_rate=1e-2,           
-max_depth=30,               
-subsample=0.5,                
-colsample_bytree=0.5,         
-gamma=1,                      
-reg_lambda=0,                 
-reg_alpha=1,           
-    
+1. `notebooks/01_analise_exploratoria.ipynb`: validação do dataset, estatísticas, classes, correlações e figuras.
+2. `notebooks/02_treinamento_e_avaliacao.ipynb`: split estratificado, validação cruzada, treino dos modelos, threshold, relatório e matriz de confusão.
 
+Execute a partir da raiz do repositório. Os notebooks salvam figuras em `reports/figures/` e modelos em `models/`.
 
+## Método e métricas
 
-# Funcionalidades
-Classificação de tumores em Benigno / Maligno  
-Threshold ajustável para priorizar recall clínico  
-Funções de predição e cálculo de métricas (F1, AUC, precision, recall)  
-Modelo serializado com joblib
+O alvo é codificado como benigno `0` e maligno `1`. O split usa `test_size=0.4` e `random_state=42`, como na implementação original, e agora também é estratificado para manter a proporção das classes. O threshold do XGBoost é selecionado exclusivamente nas probabilidades do conjunto de treino, maximizando recall sob precisão mínima de 0.90, e então aplicado ao teste.
 
+O relatório mantém **precision, recall, F1-score, support, accuracy, macro avg e weighted avg**, além de **AUC-ROC, matriz de confusão, curva ROC e validação cruzada**. Os valores abaixo são resultados previamente registrados no README original; como o CSV e o artefato treinado não estão versionados, eles não foram recalculados nesta reorganização.
 
-# Predição
-Foram implementadas funções utilitárias para cálculo de métricas e geração de previsões com threshold ajustável.
+| Métrica registrada | Valor |
+|---|---:|
+| Threshold | 0.119 |
+| AUC-ROC | 0.998 |
+| Accuracy | 0.943 |
+| Recall benigno (0) | 0.912 |
+| Recall maligno (1) | 1.000 |
+| Precision benigno (0) | 1.000 |
+| Precision maligno (1) | 0.860 |
+| F1 benigno (0) | 0.954 |
+| F1 maligno (1) | 0.925 |
+| Matriz de confusão | `[[135, 13], [0, 80]]` |
+| CV (3 folds, registrada) | `[0.9649, 0.9737, 0.9469]` |
 
+Esses números são referência histórica, não uma garantia de reprodução. Como o split agora é estratificado, os notebooks recalculam todas as métricas com o dataset local.
 
+## Figuras existentes
 
-# Métricas de Avaliação do Modelo
+As figuras originais foram preservadas:
 
-Usando F1-score, accuracy, precision e auc como avaliação do modelo.  
+![Curva ROC](images/curva_roc.png)
+![Boxplot](images/boxplot.png)
+![Correlação das variáveis](images/correlacao_variaveis.png)
+![Distribuição das classes](images/distribuicao_classes.png)
+![Distribuição dos dados](images/distribuicao_dados.png)
 
-AUC-ROC (Área sob a curva ROC): mede a capacidade do modelo de distinguir entre classes.  
-Varia de 0 a 1, onde 1 indica um modelo perfeito
+## Reprodutibilidade e manutenção
 
-Precision (Precisão): proporção de predições positivas que estavam corretas.  
-Quanto menor o falso positivo, maior a precisão.
-
-Recall (Sensibilidade): proporção de positivos reais que foram corretamente identificados.  
-#Quanto menor o falso negativo, maior o recall.
-
-F1-Score: média harmônica entre Precision e Recall.  
-Balanceia precisão e sensibilidade, útil quando as classes são desbalanceadas.
-
-Cross Validation: [0.96491228 0.97368421 0.94690265]  
-Threshold escolhido: 0.119  
-AUC-ROC: 0.998  
-Relatório de Classificacao:
-
-``` python
-              precision    recall  f1-score   support
-
-           0      1.000     0.912     0.954       148
-           1      0.860     1.000     0.925        80
-
-    accuracy                          0.943       228
-   macro avg      0.930     0.956     0.939       228
-weighted avg      0.951     0.943     0.944       228
-
-
-#Matriz de Confusão:
-[[135  13]
- [  0  80]]
-```
-
-O modelo apresentou excelente desempenho, com AUC-ROC de 0.998 e validação cruzada entre 94% e 97%, indicando boa capacidade de generalização. No conjunto de teste, alcançou acurácia de 94% e recall de 100% para a classe maligna, acertando todos os positivos, o que reforça sua aplicabilidade em cenários de apoio ao diagnóstico.
-
-# Decisão de Threshold
-
-Em contextos médicos, falsos negativos são mais críticos que falsos positivos. Por esse motivo, o threshold foi ajustado com base na curva Precision-Recall no conjunto de treino, priorizando o recall da classe maligna.
-
-# Tecnologias Utilizadas  
-Python 3.10+  
-XGBoost, RandomForest  
-Pandas
-Numpy
-Scikit-learn  
-Matplotlib
-Seaborn
-
-# Visualizações
-
-Curva ROC  
-Boxplots de variáveis  
-Correlação entre variáveis e target  
-Distribuição das classes  
-Distribuição das variaveis
-
-![Curva roc](images/curva_roc.png)
-
-![BoxPlot](images/boxplot.png)
-
-![Correlação das variaveis](images/correlacao_variaveis.png)
-
-![Distribuição das classes malignas e benignas](images/distribuicao_classes.png)
-
-![Distribuicao dos dados](images/distribuicao_dados.png)
+- Configurações do modelo e caminhos ficam centralizados no pacote `src/breast_cancer`.
+- Os dados brutos, modelos, logs e resultados gerados são ignorados pelo Git; não coloque dados sensíveis no repositório.
+- O XGBoost usa `random_state` explícito e o split é estratificado.
+- O threshold não é escolhido no conjunto de teste.
+- Para uso real, seria necessária validação externa, análise clínica e governança apropriada.
