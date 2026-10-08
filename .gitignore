@@ -9,11 +9,16 @@ __pycache__/
 # Distribution / packaging
 data/raw/*.csv
 data/processed/*
-!data/raw/.gitkeep
-models/*
-!models/.gitkeep
-reports/*
-!reports/.gitkeep
+!data/processed/.gitkeep
+models/candidates/*.joblib
+models/best_model/*.joblib
+!models/candidates/.gitkeep
+!models/best_model/.gitkeep
+reports/metrics.json
+reports/oof/*.csv
+reports/figures/*.png
+!reports/oof/.gitkeep
+!reports/figures/.gitkeep
 logs/
 .Python
 build/

@@ -10,3 +10,11 @@ def make_xgboost() -> XGBClassifier:
 
 def make_random_forest() -> RandomForestClassifier:
     return RandomForestClassifier(n_estimators=1000, random_state=RANDOM_STATE, n_jobs=-1)
+
+
+def make_candidates() -> dict:
+    """Instancia os modelos candidatos do projeto."""
+    return {
+        "random_forest": make_random_forest(),
+        "xgboost": make_xgboost(),
+    }

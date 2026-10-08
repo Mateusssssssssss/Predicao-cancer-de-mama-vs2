@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from sklearn.metrics import ConfusionMatrixDisplay
 import seaborn as sns
 
 
@@ -59,3 +60,32 @@ def save_roc_curve(fpr, tpr, auc_value: float, output_path: str | Path) -> None:
     plt.tight_layout()
     plt.savefig(output_path, dpi=150)
     plt.close()
+
+
+def save_pr_curve(precision, recall, auprc: float, output_path: str | Path) -> None:
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.figure(figsize=(8, 6))
+    plt.plot(recall, precision, label=f"Precision-Recall (AUPRC = {auprc:.3f})",
+             color="darkgreen", lw=2)
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.title("Curva Precision-Recall")
+    plt.grid(linestyle="--", alpha=0.6)
+    plt.legend(loc="lower left")
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150)
+    plt.close()
+
+
+def save_confusion_matrix(y_true, y_pred, output_path: str | Path) -> None:
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    display = ConfusionMatrixDisplay.from_predictions(
+        y_true, y_pred, labels=[0, 1], display_labels=["Benigno", "Maligno"],
+        cmap="Blues", values_format="d",
+    )
+    display.ax_.set_title("Matriz de confusão")
+    display.figure_.tight_layout()
+    display.figure_.savefig(output_path, dpi=150)
+    plt.close(display.figure_)
