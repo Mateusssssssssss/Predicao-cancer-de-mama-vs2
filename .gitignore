@@ -16,8 +16,10 @@ models/best_model/*.joblib
 !models/best_model/.gitkeep
 reports/metrics.json
 reports/oof/*.csv
+reports/validation/*.csv
 reports/figures/*.png
 !reports/oof/.gitkeep
+!reports/validation/.gitkeep
 !reports/figures/.gitkeep
 logs/
 .Python

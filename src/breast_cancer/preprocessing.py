@@ -1,7 +1,10 @@
+from math import isclose
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from breast_cancer.config import RANDOM_STATE, TARGET_COLUMN, TEST_SIZE
+from breast_cancer.config import (RANDOM_STATE, TARGET_COLUMN, TEST_SIZE,
+                                  TRAIN_SIZE, VALIDATION_SIZE)
 from breast_cancer.data import clean_data
 
 
@@ -14,11 +17,20 @@ def separate_features_target(frame: pd.DataFrame):
     return frame, labels.astype("int8")
 
 
-def prepare_data(frame: pd.DataFrame, test_size: float = TEST_SIZE,
+def prepare_data(frame: pd.DataFrame, train_size: float = TRAIN_SIZE,
+                 validation_size: float = VALIDATION_SIZE,
+                 test_size: float = TEST_SIZE,
                  random_state: int = RANDOM_STATE):
-    """Codifica B=0/M=1 e retorna split estratificado em X_train, X_test, y_train, y_test."""
+    """Retorna split estratificado em treino, validação e teste, nessa ordem."""
+    if not isclose(train_size + validation_size + test_size, 1.0):
+        raise ValueError("train_size, validation_size e test_size devem somar 1.0.")
     features, labels = separate_features_target(frame)
-    return train_test_split(
-        features, labels.astype("int8"), test_size=test_size,
+    X_train, X_remaining, y_train, y_remaining = train_test_split(
+        features, labels, train_size=train_size,
         random_state=random_state, stratify=labels,
     )
+    X_validation, X_test, y_validation, y_test = train_test_split(
+        X_remaining, y_remaining, test_size=test_size / (validation_size + test_size),
+        random_state=random_state, stratify=y_remaining,
+    )
+    return X_train, X_validation, X_test, y_train, y_validation, y_test
