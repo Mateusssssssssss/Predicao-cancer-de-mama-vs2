@@ -15,7 +15,11 @@ Predicao-cancer-de-mama-vs2/
 │   └── processed/
 │       └── .gitkeep
 ├── images/
-│   └── imagens_originais/
+│   ├── boxplot.png
+│   ├── correlacao_variaveis.png
+│   ├── curva_roc.png
+│   ├── distribuicao_classes.png
+│   └── distribuicao_dados.png
 ├── models/
 │   ├── candidates/
 │   │   ├── random_forest.joblib
@@ -186,15 +190,15 @@ O relatório mantém **precision, recall, F1-score, support, accuracy, macro avg
 
 ## Figuras existentes
 
-As figuras originais foram preservadas:
+As figuras originais ficam diretamente em `images/`:
 
-![Curva ROC](reports/figures/curva_roc.png)
-![Curva Precision-Recall](reports/figures/curva_pr.png)
-![Matriz de confusão](reports/figures/matriz_confusao.png)
-![Boxplot](reports/figures/boxplot.png)
-![Correlação das variáveis](reports/figures/correlacao_variaveis.png)
-![Distribuição das classes](reports/figures/distribuicao_classes.png)
-![Distribuição dos dados](reports/figures/distribuicao_dados.png)
+![Curva ROC](images/curva_roc.png)
+![Boxplot](images/boxplot.png)
+![Correlação das variáveis](images/correlacao_variaveis.png)
+![Distribuição das classes](images/distribuicao_classes.png)
+![Distribuição dos dados](images/distribuicao_dados.png)
+
+As figuras de avaliação mais recentes, incluindo a curva Precision-Recall e a matriz de confusão, são geradas em `reports/figures/` ao executar o notebook de treinamento.
 
 ## Reprodutibilidade e manutenção
 
